@@ -5,23 +5,22 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/internal"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/internal"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), consent.AssetNames(), consent.Asset, []string{"migrations/sql/tests/cockroach"}, true),
 }
 
 func TestXXMigrations(t *testing.T) {
@@ -42,7 +41,7 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{client.Migrations, consent.Migrations},
 		migratest.MigrationSchemas{nil, createMigrations},
 		x.CleanSQL, x.CleanSQL,
-		func(t *testing.T, db *sqlx.DB, sk, step, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, sk, step, steps int) {
 			if sk == 0 {
 				t.Skip("Nothing to do...")
 				return

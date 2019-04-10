@@ -25,23 +25,22 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
-	"github.com/ory/hydra/internal"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
+	"github.com/ory/hydra/internal"
 	. "github.com/ory/hydra/jwk"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests/cockroach"}, true),
 }
 
 func TestXXMigrations(t *testing.T) {
@@ -58,7 +57,7 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{createMigrations},
 		x.CleanSQL,
 		x.CleanSQL,
-		func(t *testing.T, db *sqlx.DB, k, m, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
