@@ -35,8 +35,9 @@ import (
 )
 
 var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
 }
 
 func CleanTestDB(t *testing.T, db *sqlx.DB) {
@@ -59,7 +60,7 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{Migrations},
 		migratest.MigrationSchemas{createMigrations},
 		CleanTestDB, CleanTestDB,
-		func(t *testing.T, db *sqlx.DB, _, step, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, _, step, steps int) {
 			id := fmt.Sprintf("%d-data", step+1)
 			t.Run("poll="+id, func(t *testing.T) {
 				s := NewSQLManager(db, nil)

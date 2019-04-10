@@ -5,25 +5,24 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ory/hydra/x"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/hydra/internal"
-
 	"github.com/ory/fosite"
 	"github.com/ory/hydra/client"
 	"github.com/ory/hydra/consent"
+	"github.com/ory/hydra/internal"
 	"github.com/ory/hydra/oauth2"
+	"github.com/ory/hydra/x"
 	"github.com/ory/x/dbal"
 	"github.com/ory/x/dbal/migratest"
 )
 
 var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:      dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL: dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
+	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
 }
 
 func TestXXMigrations(t *testing.T) {
@@ -38,7 +37,7 @@ func TestXXMigrations(t *testing.T) {
 		migratest.MigrationSchemas{nil, nil, createMigrations},
 		x.CleanSQL,
 		x.CleanSQL,
-		func(t *testing.T, db *sqlx.DB, m, k, steps int) {
+		func(t *testing.T, dbName string, db *sqlx.DB, m, k, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
 				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
@@ -51,7 +50,7 @@ func TestXXMigrations(t *testing.T) {
 				s := reg.OAuth2Storage().(*oauth2.FositeSQLStore)
 				sig := fmt.Sprintf("%d-sig", k+1)
 
-				if k < 8 {
+				if k < 8 && dbName != "cockroach" {
 					// With migration 8, all previous test data has been removed because the client is non-existent.
 					_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 					require.Error(t, err)
