@@ -26,7 +26,6 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/hydra/client"
@@ -37,12 +36,6 @@ import (
 	"github.com/ory/x/dbal/migratest"
 )
 
-var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), AssetNames(), Asset, []string{"migrations/sql/tests"}, true),
-}
-
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
@@ -51,14 +44,20 @@ func TestXXMigrations(t *testing.T) {
 
 	require.True(t, len(client.Migrations[dbal.DriverMySQL].Box.List()) == len(client.Migrations[dbal.DriverPostgreSQL].Box.List()))
 
+	migrations := migratest.MigrationSchemas{Migrations}
+	testMigrations := migratest.MigrationSchemas{dbal.FindMatchingTestMigrations("migrations/sql/tests/", migrations, AssetNames(), Asset)}
+
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{Migrations},
-		migratest.MigrationSchemas{createMigrations},
+		migrations,
+		testMigrations,
 		x.CleanSQL,
 		x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, k, m, steps int) {
 			t.Run(fmt.Sprintf("poll=%d", k), func(t *testing.T) {
+				if dbName == "cockroach" {
+					k += 3
+				}
 				conf := internal.NewConfigurationWithDefaults()
 				reg := internal.NewRegistrySQL(conf, db)
 

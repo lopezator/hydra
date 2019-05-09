@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/ory/fosite"
@@ -19,22 +18,19 @@ import (
 	"github.com/ory/x/dbal/migratest"
 )
 
-var createMigrations = map[string]*dbal.PackrMigrationSource{
-	dbal.DriverMySQL:       dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverPostgreSQL:  dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-	dbal.DriverCockroachDB: dbal.NewMustPackerMigrationSource(logrus.New(), oauth2.AssetNames(), oauth2.Asset, []string{"migrations/sql/tests"}, true),
-}
-
 func TestXXMigrations(t *testing.T) {
 	if testing.Short() {
 		t.SkipNow()
 		return
 	}
 
+	migrations := migratest.MigrationSchemas{client.Migrations, consent.Migrations, oauth2.Migrations}
+	testMigrations := migratest.MigrationSchemas{nil, nil, dbal.FindMatchingTestMigrations("migrations/sql/tests/", migrations, oauth2.AssetNames(), oauth2.Asset)}
+
 	migratest.RunPackrMigrationTests(
 		t,
-		migratest.MigrationSchemas{client.Migrations, consent.Migrations, oauth2.Migrations},
-		migratest.MigrationSchemas{nil, nil, createMigrations},
+		migrations,
+		testMigrations,
 		x.CleanSQL,
 		x.CleanSQL,
 		func(t *testing.T, dbName string, db *sqlx.DB, m, k, steps int) {
@@ -48,9 +44,13 @@ func TestXXMigrations(t *testing.T) {
 				}
 
 				s := reg.OAuth2Storage().(*oauth2.FositeSQLStore)
-				sig := fmt.Sprintf("%d-sig", k+1)
+				l := k + 1
+				if dbName == "cockroach" {
+					l += 8
+				}
+				sig := fmt.Sprintf("%d-sig", l)
 
-				if k < 8 && dbName != "cockroach" {
+				if l < 8 {
 					// With migration 8, all previous test data has been removed because the client is non-existent.
 					_, err := s.GetAccessTokenSession(context.Background(), sig, oauth2.NewSession(""))
 					require.Error(t, err)

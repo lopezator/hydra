@@ -421,6 +421,8 @@ github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lib/pq v1.0.0 h1:X5PMW56eZitiTeO7tKzZxFCSpbFZJtkMMooicw2us9A=
 github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+github.com/lopezator/x v0.0.38-0.20190509145217-7d97df8d139b h1:RbAK4lL7psZPhwtzT9r8c3VsUgnlOK2WMmKTmh/Vp4Y=
+github.com/lopezator/x v0.0.38-0.20190509145217-7d97df8d139b/go.mod h1:da8VE+hIbNK87ppdGvzRFpOgozsT0yKYm82MC/0eGaY=
 github.com/luna-duclos/instrumentedsql v0.0.0-20181127104832-b7d587d28109/go.mod h1:PWUIzhtavmOR965zfawVsHXbEuU1G29BPZ/CB3C7jXk=
 github.com/luna-duclos/instrumentedsql v0.0.0-20190316074304-ecad98b20aec h1:KWGe9RPYdAnJMmFpP0HlnlthjfvQ0pWA9hrQlhz/cdM=
 github.com/luna-duclos/instrumentedsql v0.0.0-20190316074304-ecad98b20aec/go.mod h1:PWUIzhtavmOR965zfawVsHXbEuU1G29BPZ/CB3C7jXk=
@@ -512,8 +514,6 @@ github.com/ory/graceful v0.1.1/go.mod h1:zqu70l95WrKHF4AZ6tXHvAqAvpY6M7g6ttaAVcM
 github.com/ory/herodot v0.5.1/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
 github.com/ory/herodot v0.6.0 h1:Dcs4yH1Qw1GIgGCvvvdafhT8xjwElTE//8xLmHtPEYA=
 github.com/ory/herodot v0.6.0/go.mod h1:3BOneqcyBsVybCPAJoi92KN2BpJHcmDqAMcAAaJiJow=
-github.com/ory/x v0.0.57 h1:FztMYkEuuwAiu7qT0F5XoDA8zO8/JB8zRoVPVl6c0A0=
-github.com/ory/x v0.0.57/go.mod h1:da8VE+hIbNK87ppdGvzRFpOgozsT0yKYm82MC/0eGaY=
 github.com/parnurzeal/gorequest v0.2.15/go.mod h1:3Kh2QUMJoqw3icWAecsyzkpY7UzRfDhbRdTjtNwNiUE=
 github.com/pborman/uuid v1.2.0 h1:J7Q5mO4ysT1dv8hyrUGHb9+ooztCXu1D8MY8DZYsu3g=
 github.com/pborman/uuid v1.2.0/go.mod h1:X/NO0urCmaxf9VXbdlT7C2Yzkj2IKimNn4k+gtPdI/k=

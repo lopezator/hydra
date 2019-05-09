@@ -81,3 +81,6 @@ replace github.com/golang/lint => github.com/golang/lint v0.0.0-20190227174305-8
 
 // Fix for https://github.com/golang/go/issues/27056
 replace github.com/ory/hydra/sdk/go/hydra => ./sdk/go/hydra
+
+// TODO(lopezator) remove this after merging to ory/x
+replace github.com/ory/x => github.com/lopezator/x v0.0.38-0.20190509145217-7d97df8d139b
